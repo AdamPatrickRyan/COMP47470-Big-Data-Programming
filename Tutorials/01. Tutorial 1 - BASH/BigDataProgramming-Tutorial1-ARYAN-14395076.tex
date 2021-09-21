@@ -1,0 +1,139 @@
+%Copyright 2014 Jean-Philippe Eisenbarth
+%This program is free software: you can 
+%redistribute it and/or modify it under the terms of the GNU General Public 
+%License as published by the Free Software Foundation, either version 3 of the 
+%License, or (at your option) any later version.
+%This program is distributed in the hope that it will be useful,but WITHOUT ANY 
+%WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A 
+%PARTICULAR PURPOSE. See the GNU General Public License for more details.
+%You should have received a copy of the GNU General Public License along with 
+%this program.  If not, see <http://www.gnu.org/licenses/>.
+
+%Based on the code of Yiannis Lazarides
+%http://tex.stackexchange.com/questions/42602/software-requirements-specification-with-latex
+%http://tex.stackexchange.com/users/963/yiannis-lazarides
+%Also based on the template of Karl E. Wiegers
+%http://www.se.rit.edu/~emad/teaching/slides/srs_template_sep14.pdf
+%http://karlwiegers.com
+
+
+\documentclass{scrreprt}
+
+\usepackage{pdfpages}
+\usepackage{listings}
+\usepackage{placeins}
+\usepackage{float}
+\usepackage{underscore}
+\usepackage[bookmarks=true]{hyperref}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{subfigure}
+\usepackage[english]{babel}
+\hypersetup{
+    bookmarks=false,    % show bookmarks bar?
+    pdftitle={Software Requirement Specification},    % title
+    pdfauthor={Adam-Ryan},                     % author
+    pdfsubject={TeX and LaTeX},                        % subject of the document
+    pdfkeywords={TeX, LaTeX, graphics, images}, % list of keywords
+    colorlinks=true,       % false: boxed links; true: colored links
+    linkcolor=blue,       % color of internal links
+    citecolor=black,       % color of links to bibliography
+    filecolor=black,        % color of file links
+    urlcolor=blue,        % color of external links
+    linktoc=page            % only page is linked
+}%
+\def\myversion{1 }
+\date{}
+%\title{%
+
+%}
+\usepackage{hyperref}
+\begin{document}
+
+\begin{flushright}
+    \rule{16cm}{5pt}\vskip1cm
+    \begin{bfseries}
+        \Huge{Tutorial 1\\}
+        \vspace{1.9cm}
+        for\\
+        \vspace{1.9cm}
+        Big Data Programming in BASH
+        \vspace{1.9cm}
+        \LARGE{Version \myversion}\\
+        \vspace{1.9cm}
+        Adam Ryan (14395076)\\
+        \vspace{1.9cm}
+        COMP47470\\
+        \vspace{1.9cm}
+        \today\\
+    \end{bfseries}
+\end{flushright}
+
+\tableofcontents
+
+\chapter{Questions}\label{Intro}
+
+\section{Purpose}\label{Purpose}
+This section charts the questions to the lab1 notebook in Big Data Programming which looks at using Bash and installing Docker.
+
+\section{Exercise 1}\label{Overview}
+The following details the questions in section 1.
+\begin{itemize}
+	\item What is the output of the commands:
+	\begin{itemize}
+		\item echo \{0..9\}\{echo 1.\{0..9\}
+		\item echo 1.\{0..9\}
+		\item echo \{A..C\}\{0..2\}
+	\end{itemize}
+	\item Use sort to sort the content of/etc/passwd
+	\item Use grep to list only the line from/proc/meminfothat shows total memory (the nameof the variable is MemTotal).
+	\item Use grep to send all the lines with "to" in the syslog file (/var/log/syslog\_public).Then redirect this output into the syslog in your home directory.
+	\item List all of the files in a directory in reverse date order, so that the most recent is at the bottom (ls).
+\end{itemize}
+
+
+\section{Exercise 2}\label{Overview}
+The following details the questions in section 2.
+\begin{itemize}
+	\item Download the dataset as unirank.csv using wget (capital o option).
+	\item Explore the file.
+	\item Find all the "colleges" in the list (e.g.  UniversityCollegeDublin, thinkgrep).
+	\item List and group all the HEIs by state (cut,sort).
+	\item  Find  the  number  of  HEIs  per  state  (cut,sort,uniq).  (which  state  has  the  most institutes in the dataset?)
+	\item Create a list (x, y) of couples containing the Tuitions and Fees (x) and the rank (y)for each institute.  Get this  le to your host machine and plot the values using Excel,gnuplot, etc.  What do you notice?
+\end{itemize}
+
+\chapter{Answers}\label{Design}
+
+\section{Purpose}\label{Purpose}
+This section charts the solutions to the lab1 notebook in Big Data Programming which looks at using Bash and installing Docker.
+
+
+\section{Exercise 1}\label{Overview}
+The following details the questions in section 1.
+\begin{itemize}
+	\item What is the output of the commands:
+	\begin{itemize}
+		\item echo \{0..9\}\ prints all of the characters 0 1 2 3 4 5 6 7 8 9 
+		\item echo 1.\{0..9\} prints all of the characters  1.0 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 1.9 
+		\item echo \{A..C\}\{0..2\} prints all of the characters A.0 A.1 A.2 B.0 B.1 B.2 C.0 C.1 C.2
+	\end{itemize}
+	\item Use sort to sort etc passwd was complete.
+	\item grep MemTotal /proc/meminfo
+	\item (File path for this exercise does not exist)
+	\item ls -ltr
+\end{itemize}
+
+
+\section{Exercise 2}\label{Overview}
+The following details the questions in section 2.
+\begin{itemize}
+	\item  wget -o unirank.csv http://csserver.ucd.ie/~thomas/unirank
+	\item cat/sort/ etc
+	\item grep College ./unirank
+	\item cut -d"," -f1,3 unirank | sort -k2 
+	\item  cut -d"," -f3 unirank | sort -k2 | uniq -c
+	\item  docker cp BigDataProgramming:/home/COMP47470/lab1/final\_question.txt ./ and subsequently open in Excel.
+\end{itemize}
+
+\end{document}
