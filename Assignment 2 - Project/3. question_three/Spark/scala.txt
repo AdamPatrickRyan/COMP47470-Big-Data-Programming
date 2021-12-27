@@ -1,0 +1,24 @@
+import org.apache.sql
+
+import org.apache.sql.SparkSession
+
+val spark = SparkSession.builder().appname("app_name").master("local").getOrCreate()
+
+val df = spark.read.format("csv").option("header","true").load("spark.csv")
+
+\\Question1
+df.count()
+df.registerTempTable("dfTable")
+
+\\Question2
+spark.sql("SELECT * FROM dfTable ORDER BY CAST(`No.Reviews` AS INT) DESC LIMIT 1").show
+
+\\Question3
+spark.sql("Select *,Length(Restaurant) AS LengthName From dfTable ORDER BY LENGTH(Restaurant) desc LIMIT 1").show
+
+\\Question4
+spark.sql("Select `Region`,SUM(CAST(`No.Reviews` AS INT)) AS `No_Reviews` From dfTable Group By Region").show
+
+\\Question5
+val wordCount_df=df.withColumn("ReviewText", explode(split(trim(col("Reviewtext")), " "))).groupBy("ReviewText").count().sort($"count".desc)
+wordCount_df.filter(!col("ReviewText").isin(Seq("The","and","of"):_*)).show

@@ -1,0 +1,9 @@
+Bisque-Mu	1
+Burlywood-Epsilon	1
+Darkkhaki-Zeta	1
+Ghostwhite-Omicron	1
+Goldenrod-Sigma	1
+Mediumvioletred-Eta	1
+Midnightblue-Rho	1
+Sandybrown-Iota	1
+Seashell-Zeta	1

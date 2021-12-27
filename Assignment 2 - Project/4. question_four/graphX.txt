@@ -1,0 +1,101 @@
+import org.apache.spark
+import org.apache.spark.rdd
+import org.apache.spark.rdd.RDD
+import org.apache.spark.graphx._
+import org.apache.spark.util.IntParam
+import org.apache.spark.graphx.util.GraphGenerators
+
+
+//CSV Structure
+case class Trip(Index:String
+            ,Route:String
+            ,From:String
+            ,To:String
+            ,Trip_No:String)
+
+
+//Parse the CSV which I've named GraphX_Edges
+var trip_txt_RDD = sc.textFile("GraphX_Edges.csv")
+
+//Remove header from RDD
+val trip_header=trip_txt_RDD.first()
+trip_txt_RDD = trip_txt_RDD.filter(row => row != trip_header)
+
+
+//Function to Read Trip
+def read_trip(str: String): Trip = {
+    val line = str.split(",");
+    Trip(line(0)
+                ,line(1)
+                ,line(2)
+                ,line(3)
+                ,line(4))
+}
+
+
+//Trip RDD
+var trip_RDD = trip_txt_RDD.map(read_trip).cache()
+
+//Map harbours to an ID - Doesn't need to be the harbour number from the original file, just needs to be a long. 
+//-Take all harbours
+//-Map each harbour to an ID
+//-Name of harbour points to that ID
+//-Used because Edges requires Long,Long not Text,Text.
+
+val harbours = trip_RDD.flatMap(trip => Seq( (trip.From), (trip.To) )).distinct.zipWithIndex.map(h => (h._2, h._1))
+val harbour_to_id_map =  harbours.map{case(id,name) => (name -> id)}.collect.toMap
+
+\\Inverse map for getting back harbour names
+val id_to_harbour_map =  harbours.map{case(id,name) => (id -> name)}.collect.toMap
+
+val journey=trip_RDD.map(trip => ((harbour_to_id_map(trip.From),harbour_to_id_map(trip.To)))).distinct
+
+//Edge ID back to Edge Name
+val edge_to_routename_map=trip_RDD.map(trip => (((harbour_to_id_map(trip.From),harbour_to_id_map(trip.To)),trip.Route))).distinct.collect.toMap
+
+
+//Null Vertex
+val nowhere = "nowhere"
+
+//Edges - Weight of zero.
+val edges=journey.map{case (harbour_from_id,harbour_to_id) => Edge(harbour_from_id, harbour_to_id,"0")}
+
+//Create a graph
+val graph = Graph(harbours, edges, nowhere)
+
+///THIS COMPLETES PART 1
+
+//Part 2: 
+//-All neighbouring Harbours
+//--Note: the routes are inherently Key to Value.
+val answer=graph.collectNeighbors(EdgeDirection.Out).map(list => (id_to_harbour_map(list._1), list._2))
+
+//-Using Edges
+val answer_alt=graph.collectEdges(EdgeDirection.Out)
+
+
+//Part 3:
+trip_RDD.filter(_.Route=="Porium Thirty-one").take(1)
+//We see there are NO routes with this name in the original dataset so nothing to do here
+
+//Part 4:
+val harb_with_max_edges=graph.inDegrees.reduce( (a,b) => if (a._2 > b._2) a else b)
+id_to_harbour_map(harb_with_max_edges._1)
+
+
+//Part 5:
+//--This is the EXACT same question...
+val harb_with_max_edges=graph.inDegrees.reduce( (a,b) => if (a._2 > b._2) a else b)
+id_to_harbour_map(harb_with_max_edges._1)
+
+
+//--If it's meant to be harbours in largest connected component.
+val cc = graph.connectedComponents().vertices.collectAsMap()
+val clusters=cc.view.map{
+        case (vertexId, clusterId) =>
+          (clusterId, id_to_harbour_map(vertexId))
+      }.toList
+
+val top_cluster_no=clusters.toDF("cluster","name").groupBy("cluster").count().sort(desc("count")).take(1)
+clusters.filter(_._1==top_cluster_no(0)(0))
+
